@@ -1,13 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
     const pinKey = "app_pin";
     const attemptsKey = "pin_attempts";
+    const firstKey = "first_time_done";
+    const firstCode = "8551";
     const maxAttempts = 20;
 
     const displayDots = document.querySelectorAll('.dot');
     const banner = document.getElementById("banner");
-    let pin = '';
+    const keyboard = document.getElementById("keyboard");
 
-    function showBanner(message, duration = 3000) {
+    let pin = '';
+    let mode = localStorage.getItem(firstKey) ? 'login' : 'first';
+
+    const modeTitles = {
+        first: "הזן קוד ראשוני (8551)",
+        setPin: "הגדר קוד PIN חדש",
+        login: "הזן קוד PIN"
+    };
+
+    document.querySelector("h2").innerText = modeTitles[mode];
+
+    function showBanner(message, duration = 2500) {
         banner.textContent = message;
         banner.classList.remove("hidden");
         clearTimeout(banner._timeout);
@@ -27,48 +40,52 @@ document.addEventListener("DOMContentLoaded", () => {
         updateDisplay();
     }
 
-    // שלב 1: בדיקה אם זו כניסה ראשונה
-    if (!localStorage.getItem("first_time_done")) {
-        let firstPIN = prompt("קוד ראשוני (8551):");
-        if (firstPIN === "8551") {
-            localStorage.setItem("first_time_done", "true");
-            alert("קוד ראשוני נכון, כעת הגדר קוד PIN חדש.");
-        } else {
-            window.location.href = "codes.html";
-            return;
-        }
-    }
-
-    document.getElementById('keyboard').addEventListener('click', (e) => {
-        if (!e.target.classList.contains('key')) return;
+    keyboard.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("key")) return;
         const key = e.target.textContent;
 
-        if (key === '⌫') {
+        if (key === "⌫") {
             pin = pin.slice(0, -1);
-        } else if (key === '✔') {
+        } else if (key === "✔") {
             if (pin.length !== 4) {
-                showBanner('נא להזין 4 ספרות');
+                showBanner("נא להזין 4 ספרות");
                 return;
             }
 
-            const savedPin = localStorage.getItem(pinKey);
-            let attempts = parseInt(localStorage.getItem(attemptsKey) || "0");
+            // מצב: קוד ראשוני
+            if (mode === "first") {
+                if (pin === firstCode) {
+                    localStorage.setItem(firstKey, "true");
+                    mode = "setPin";
+                    document.querySelector("h2").innerText = modeTitles[mode];
+                    showBanner("קוד נכון, עכשיו בחר קוד חדש");
+                } else {
+                    window.location.href = "codes.html";
+                }
+            }
 
-            // אם אין PIN – נשמר הפין הראשון שהוזן
-            if (!savedPin) {
+            // מצב: הגדרת קוד חדש
+            else if (mode === "setPin") {
                 localStorage.setItem(pinKey, pin);
                 localStorage.setItem(attemptsKey, "0");
-                showBanner('הקוד נשמר! תתבקש להזין אותו בפעם הבאה.');
-            } else {
+                mode = "login";
+                document.querySelector("h2").innerText = modeTitles[mode];
+                showBanner("הקוד נשמר בהצלחה");
+            }
+
+            // מצב: התחברות רגילה
+            else if (mode === "login") {
+                const savedPin = localStorage.getItem(pinKey);
+                let attempts = parseInt(localStorage.getItem(attemptsKey) || "0");
+
                 if (pin === savedPin) {
+                    showBanner("ברוך הבא!");
                     localStorage.setItem(attemptsKey, "0");
-                    showBanner('ברוך הבא!');
                     // window.location.href = "home.html";
                 } else {
                     attempts++;
                     localStorage.setItem(attemptsKey, attempts);
                     if (attempts >= maxAttempts) {
-                        showBanner("הגעת למקסימום ניסיונות. עובר לדף קוד גיבוי.");
                         window.location.href = "codes.html";
                     } else {
                         showBanner(`קוד שגוי. ניסיון ${attempts} מתוך ${maxAttempts}`);
@@ -83,9 +100,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateDisplay();
     });
-
-    // הודעה התחלתית אם אין PIN
-    if (!localStorage.getItem(pinKey)) {
-        showBanner("הזן קוד PIN חדש");
-    }
 });
