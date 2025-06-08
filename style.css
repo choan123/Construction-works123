@@ -46,8 +46,6 @@ body {
 
 .banner {
     margin-top: 30px;
-    background-color: #cc4848;
-    color: white;
     padding: 15px 25px;
     border-radius: 10px;
     font-size: 16px;
@@ -56,9 +54,22 @@ body {
     display: inline-block;
 }
 
+.banner.info {
+    background-color: #4267B2;
+    /* כחול */
+    color: white;
+}
+
+.banner.error {
+    background-color: #cc4848;
+    /* אדום */
+    color: white;
+}
+
 .banner.hidden {
     display: none;
 }
+
 
 @keyframes flash {
     0% {
