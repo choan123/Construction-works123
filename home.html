@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="he">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>דף הבית - פרויקטים</title>
+    <link rel="stylesheet" href="style2.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-top">
+            <div class="header-title">ניהול שיפוצים</div>
+            <button class="add-btn" onclick="location.href='sors.html'">➕ הוסף פרויקט חדש</button>
+        </div>
+
+        <div class="search-bar-container">
+            <input type="text" id="projectSearch" class="search-bar" placeholder="חפש פרויקט...">
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="copyCodeBtn"
+                style="font-size: 1.1em; padding: 10px 20px; border-radius: 12px; background: #e0e0e0; border: none; cursor: pointer;">
+                📋 העתק קוד לאתר: A1@k8z
+            </button>
+        </div>
+    </header>
+
+
+    <main id="projectsContainer">
+        <!-- כרטיסי פרויקטים ייכנסו כאן -->
+    </main>
+
+    <div class="pagination" id="pagination"></div>
+
+    <script>
+        const PROJECTS_PER_PAGE = 10;
+        const fallbackImage = 'fallback.png'; // תמונה קבועה מקומית למקרה שאין תמונות
+
+        // התחלה עם אפס פרויקטים (ייווצרו דינמית מאוחר יותר)
+        const allProjects = []; // להתחלה ללא נתונים
+
+        let currentPage = 1;
+
+        function renderProjects(page) {
+            const container = document.getElementById("projectsContainer");
+            container.innerHTML = "";
+
+            if (allProjects.length === 0) {
+                container.innerHTML = '<div class="no-projects">אין עדיין פרויקטים להצגה</div>';
+                document.getElementById("pagination").innerHTML = "";
+                return;
+            }
+
+            const start = (page - 1) * PROJECTS_PER_PAGE;
+            const end = start + PROJECTS_PER_PAGE;
+            const projects = allProjects.slice(start, end);
+
+            projects.forEach(project => {
+                const imgSrc = project.images && project.images.length > 0
+                    ? project.images[Math.floor(Math.random() * project.images.length)]
+                    : fallbackImage;
+
+                const card = document.createElement("div");
+                card.className = "project-card";
+                card.innerHTML = `
+          <img src="${imgSrc}" alt="תמונה של ${project.name}">
+          <h3>${project.name}</h3>
+        `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(allProjects.length / PROJECTS_PER_PAGE);
+            const pagination = document.getElementById("pagination");
+            pagination.innerHTML = "";
+
+            if (totalPages <= 1) return;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement("button");
+                btn.textContent = i;
+                if (i === currentPage) btn.classList.add("active");
+                btn.addEventListener("click", () => {
+                    currentPage = i;
+                    renderProjects(currentPage);
+                    renderPagination();
+                });
+                pagination.appendChild(btn);
+            }
+        }
+
+        renderProjects(currentPage);
+        renderPagination();
+
+        function copySecretCode() {
+            const button = document.getElementById("copyCodeBtn");
+            const code = "A1@k8z"; // קוד מקוצר
+            navigator.clipboard.writeText(code).then(() => {
+                const originalColor = button.style.background;
+                button.style.background = "#a0e0a0"; // ירוק זמני
+                setTimeout(() => {
+                    button.style.background = originalColor;
+                }, 1000);
+            });
+        }
+
+        document.getElementById("copyCodeBtn").addEventListener("click", copySecretCode);
+    </script>
+</body>
+
+</html>
