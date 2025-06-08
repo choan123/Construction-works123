@@ -1,0 +1,71 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+    direction: rtl;
+    padding: 30px;
+}
+
+.pin-display {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.dot {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    background-color: white;
+}
+
+.dot.filled {
+    background-color: #333;
+}
+
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    gap: 10px;
+    justify-content: center;
+}
+
+.key {
+    padding: 15px;
+    font-size: 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.key:active {
+    background-color: #ddd;
+}
+
+.banner {
+    margin-top: 30px;
+    background-color: #cc4848;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size: 16px;
+    animation: flash 0.4s ease-in-out alternate infinite;
+    z-index: 1;
+    display: inline-block;
+}
+
+.banner.hidden {
+    display: none;
+}
+
+@keyframes flash {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.4;
+    }
+}
